@@ -102,6 +102,7 @@ export abstract class SimpleListRunner implements Runner {
         if (page) {
             await browser.freePage(this.id, page);
             page = null;
+            pageUsed = 0;
         }
         Log.info("%s category process is done", this.id);
     }
@@ -110,11 +111,7 @@ export abstract class SimpleListRunner implements Runner {
         return page.goto(task.uri, { waitUntil: "networkidle2" });
     }
 
-    protected async processDetailData(browser: BrowserContextCreator, page: Page, task: Task): Promise<any> {
-        /* istanbul ignore next */
-        let data = await page.evaluate(() => document.body.innerHTML);
-        return { data: data }
-    }
+    protected abstract async processDetailData(browser: BrowserContextCreator, page: Page, task: Task): Promise<any>;
 
     protected async startProcessDetail(browser: BrowserContextCreator, pagesLimit: number): Promise<any> {
         if (this.detailRunning >= pagesLimit) {
@@ -150,6 +147,11 @@ export abstract class SimpleListRunner implements Runner {
                     page = null;
                     pageUsed = 0;
                 }
+            }
+            if (page) {
+                await browser.freePage(this.id, page);
+                page = null;
+                pageUsed = 0;
             }
             Log.info("one detail process is done");
         } catch (e) {
