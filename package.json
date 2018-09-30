@@ -1,0 +1,73 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "UHF Reader",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "test": "call(){ mocha -r ts-node/register --timeout 30000  \"src/**/*$1.spec.ts\" ; }; call",
+    "test-all": "nyc mocha --register ts-node/register --require source-map-support/register --full-trace --bail --timeout 30000 src/**/*.spec.ts",
+    "start": "npm run build && node ./dist/crawler.js conf/crawler.json",
+    "proc": "npm run build && node ./dist/processor.js --listen 8082 --runner ./runner/lagou"
+  },
+  "bin": {
+    "crawler-slaver": "./dist/crawler.js"
+  },
+  "repository": "https://github.com/sutils/crawler.git",
+  "keywords": [
+    "crawler"
+  ],
+  "author": "Centny",
+  "license": "GPL-3.0",
+  "nyc": {
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ],
+    "exclude": [
+      "src/**/*.spec.ts"
+    ],
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.6",
+    "@types/mocha": "^5.2.5",
+    "chai": "^4.2.0",
+    "mocha": "^5.1.1",
+    "ts-node": "^6.2.0",
+    "nyc": "^13.0.1",
+    "source-map-support": "^0.5.9"
+  },
+  "dependencies": {
+    "@types/compression": "0.0.36",
+    "@types/express": "^4.16.0",
+    "@types/jquery": "^3.3.10",
+    "@types/jsdom": "11.0.4",
+    "@types/log4js": "^2.3.5",
+    "@types/node": "^10.11.3",
+    "@types/parse5": "^5.0.0",
+    "@types/puppeteer": "^1.6.4",
+    "@types/request": "^2.47.1",
+    "compression": "^1.7.3",
+    "express": "^4.16.3",
+    "jquery": "^3.3.1",
+    "jsdom": "^11.12.0",
+    "log4js": "^3.0.5",
+    "puppeteer": "^1.8.0",
+    "request": "^2.88.0",
+    "typescript": "^2.9.2"
+  }
+}
