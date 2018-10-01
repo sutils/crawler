@@ -36,7 +36,7 @@ const Log = log4js.getLogger("main");
     });
     Log.info("crawler is starting...");
     let crawler = new crawler_1.Crawler();
-    crawler.run(conf);
+    yield crawler.run(conf);
     function closeall() {
         return __awaiter(this, void 0, void 0, function* () {
             yield crawler.close();

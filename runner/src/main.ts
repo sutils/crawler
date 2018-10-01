@@ -31,7 +31,7 @@ const Log = log4js.getLogger("main");
     });
     Log.info("crawler is starting...");
     let crawler = new Crawler();
-    crawler.run(conf);
+    await crawler.run(conf);
     async function closeall() {
         await crawler.close()
     }

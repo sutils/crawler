@@ -28,7 +28,7 @@
   "dependencies": {
     "@types/log4js": "^2.3.5",
     "@types/node": "^10.11.3",
-    "crawler": "file:..",
+    "crawler": "git+https://github.com/sutils/crawler.git",
     "log4js": "^3.0.5",
     "typescript": "^2.9.2"
   }

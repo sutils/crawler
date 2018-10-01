@@ -4,26 +4,34 @@
     "tasks": [
         {
             "id": "qiwen8.com",
-            "type": "SimpleList",
+            "type": "QiWen8",
             "delay": 0,
             "limit": {
                 "context": {
                     "max": 16,
-                    "pages": 5
+                    "pages": 2
                 },
                 "categories": {
-                    "page_max": 1,
+                    "page_max": 2,
                     "item_max": 3
                 }
             },
             "categories": [
                 {
-                    "url": "",
-                    "tags": []
+                    "uri": "http://www.qiwen8.com/qiwenguaishi/",
+                    "tags": [
+                        "奇闻怪事"
+                    ]
                 }
             ]
         }
     ],
-    "log": "./logs/crawler",
+    "storage": {
+        "module": "crawler-pg.PgStorage",
+        "database": {
+            "connectionString": "postgresql://cny:123@loc.m:5432/cny"
+        }
+    },
+    "log": "./logs/runner",
     "level": "debug"
 }
