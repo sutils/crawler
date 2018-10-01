@@ -1,5 +1,8 @@
 import { Browser, BrowserContext, Page } from 'puppeteer';
 import { Storage } from "./storage";
+import * as log4js from "log4js";
+
+const Log = log4js.getLogger("runner");
 
 export interface BrowserContextCreator {
     browser: Browser;
@@ -92,6 +95,7 @@ var runners: any = {};
 
 export function Register(key: string, creator: (id: string, ...args: any[]) => Runner) {
     runners[key] = creator;
+    Log.info("register one %s runner creator success", key);
 }
 
 export function NewRunner(key: string, id: string, ...args: any[]): Runner {

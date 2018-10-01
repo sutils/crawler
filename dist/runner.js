@@ -8,6 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const log4js = require("log4js");
+const Log = log4js.getLogger("runner");
 class MaxBrowserContextCreator {
     constructor(creator, max) {
         this.max = 3;
@@ -87,6 +89,7 @@ exports.NativeBrowserContextCreator = NativeBrowserContextCreator;
 var runners = {};
 function Register(key, creator) {
     runners[key] = creator;
+    Log.info("register one %s runner creator success", key);
 }
 exports.Register = Register;
 function NewRunner(key, id, ...args) {
