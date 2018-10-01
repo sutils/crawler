@@ -14,6 +14,9 @@ describe('SimpleList', async () => {
         // replaceConsole:true
     });
     let storage = {
+        bootstrap: (options: any): Promise<any> => {
+            return;
+        },
         save: (uri: string, data: any, options: any): Promise<any> => {
             console.log("saving %s by %s data \n\n%s\n\n", uri, data.length, data);
             return
@@ -21,6 +24,9 @@ describe('SimpleList', async () => {
         exist: (uri: string[]): Promise<number> => {
             return Promise.resolve(uri.length);
         },
+        release: (): Promise<any> => {
+            return;
+        }
     }
     let nativeBrowser: Browser;
     let browser: NativeBrowserContextCreator

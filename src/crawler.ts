@@ -1,15 +1,16 @@
 import * as log4js from "log4js";
-import { NativeBrowserContextCreator, BrowserContextCreator, NewRunner, DataStorage } from './runner';
+import { NativeBrowserContextCreator, BrowserContextCreator, NewRunner } from './runner';
+import { Storage } from "./storage";
 import { Browser, launch } from 'puppeteer';
 
 const Log = log4js.getLogger("crawler");
 
 export class Crawler {
-    protected storage: DataStorage;
+    protected storage: Storage;
     protected browser: Browser;
     protected tasks: Promise<any>[] = [];
 
-    public Crawler(storage: DataStorage) {
+    public Crawler(storage: Storage) {
         this.storage = storage;
     }
 
@@ -31,8 +32,14 @@ export class Crawler {
 
     public async run(conf: any): Promise<any> {
         Log.info("crawler is starting...");
-        // var ip = await doGetIP();
-        // console.log("crawler public ip is " + ip);
+        //
+        //load storage
+        let moduleNames = conf.storage.module.split(".");
+        let module = require(moduleNames[0]);
+        this.storage = (new module[moduleNames[1]]()) as Storage;
+        await this.storage.bootstrap(conf.storage);
+        //
+        //load browser
         let proxy = conf.proxy ? conf.proxy : "";
         const nativeBrowser = await launch({
             args: ["--blink-settings=imagesEnabled=false", "--proxy-server=" + proxy]
@@ -62,7 +69,7 @@ export class Crawler {
         Log.info("crawler is stopped");
     }
 }
-
+export * from "./util";
+export * from "./storage";
 export * from "./runner";
 export * from "./runner/SimpleList";
-export * from "./util"

@@ -1,4 +1,6 @@
 import { Browser, BrowserContext, Page } from 'puppeteer';
+import { Storage } from "./storage";
+
 export interface BrowserContextCreator {
     browser: Browser;
     createIncognitoBrowserContext(key: string): Promise<BrowserContext>;
@@ -14,6 +16,7 @@ export class MaxBrowserContextCreator implements BrowserContextCreator {
 
     private waiting: any[] = [];
     private running: number = 0;
+    private pageContext: any = {};
 
     public constructor(creator: BrowserContextCreator, max?: number) {
         this.creator = creator;
@@ -38,11 +41,15 @@ export class MaxBrowserContextCreator implements BrowserContextCreator {
     }
 
     public async newPage(key: string): Promise<Page> {
-        return (await this.createIncognitoBrowserContext(key)).newPage()
-
+        let context = await this.createIncognitoBrowserContext(key);
+        let page = await context.newPage();
+        (page as any)["_context_"] = context;
+        return page;
     }
     public async freePage(key: string, page: Page): Promise<void> {
-        return page.close()
+        let context = ((page as any)["_context_"]) as BrowserContext;
+        await page.close()
+        return this.freeIncognitoBrowserContext(key, context);
     }
 }
 
@@ -62,7 +69,7 @@ export class NativeBrowserContextCreator implements BrowserContextCreator {
     }
 
     public async newPage(key: string): Promise<Page> {
-        return (await this.createIncognitoBrowserContext(key)).newPage()
+        return this.browser.newPage()
     }
     public async freePage(key: string, page: Page): Promise<void> {
         return await page.close()
@@ -72,7 +79,7 @@ export class NativeBrowserContextCreator implements BrowserContextCreator {
 export interface Runner {
     id: string;
     options: any;
-    storage: DataStorage;
+    storage: Storage;
     process(browser: BrowserContextCreator): Promise<any>;
 }
 
@@ -89,9 +96,4 @@ export function NewRunner(key: string, id: string, ...args: any[]): Runner {
     } else {
         return null;
     }
-}
-
-export interface DataStorage {
-    save(uri: string, data: any, options: any): Promise<any>;
-    exist(uri: string[]): Promise<number>;
 }
