@@ -33,15 +33,16 @@ class SimpleListRunner {
         return __awaiter(this, void 0, void 0, function* () {
             Log.info("%s is starting by %s", this.id, JSON.stringify(this.options));
             let limited = new runner_1.MaxBrowserContextCreator(browser, this.options.limit.context.max);
-            let delay = this.options.delay == undefined ? 30000 : this.options.delay;
             while (true) {
                 yield this.processOnce(limited);
-                if (delay < 1) {
+                if (this.options.delay) {
+                    Log.info("%s will restart process after %sms", this.id, this.options.delay);
+                    yield util_1.sleep(this.options.delay);
+                }
+                else {
                     Log.info("%s is done", this.id);
                     break;
                 }
-                Log.info("%s will restart process after %sms", this.id, delay);
-                yield util_1.sleep(delay);
             }
         });
     }

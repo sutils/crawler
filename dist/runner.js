@@ -22,7 +22,6 @@ class MaxBrowserContextCreator {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 if (this.running >= this.max) {
-                    console.log("---->a");
                     this.waiting.push({ resolve: resolve, reject: reject });
                     return;
                 }
@@ -35,7 +34,6 @@ class MaxBrowserContextCreator {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.creator.freeIncognitoBrowserContext(key, context);
             if (this.waiting.length) {
-                console.log("---->b");
                 let next = this.waiting.pop();
                 next.resolve(yield this.creator.createIncognitoBrowserContext(key));
                 return;
