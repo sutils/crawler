@@ -1,6 +1,6 @@
 
 node_modules
-dist
+dist/**/*.spec.*
 
 package-lock.json
 
@@ -19,3 +19,4 @@ build
 coverage
 logs
 src/news
+
