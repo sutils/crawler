@@ -38,7 +38,7 @@ export class Crawler {
             throw new Error("storage.module is required");
         }
         Log.info("start load storage module by %s", conf.storage.module);
-        let moduleNames = conf.storage.module.split(".");
+        let moduleNames = conf.storage.module.split(/\./);
         let module = require(moduleNames[0]);
         this.storage = (new module[moduleNames[1]]()) as Storage;
         await this.storage.bootstrap(conf.storage);

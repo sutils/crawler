@@ -14,7 +14,7 @@ export class SimpleListTask {
     public constructor(tags?: string[], uri?: string, options?: any) {
         this.tags = tags;
         this.uri = uri;
-        this.options = this.options
+        this.options = options;
     }
 }
 

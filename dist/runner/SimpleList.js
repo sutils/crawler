@@ -16,7 +16,7 @@ class SimpleListTask {
     constructor(tags, uri, options) {
         this.tags = tags;
         this.uri = uri;
-        this.options = this.options;
+        this.options = options;
     }
 }
 exports.SimpleListTask = SimpleListTask;

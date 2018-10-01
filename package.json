@@ -4,6 +4,7 @@
   "description": "UHF Reader",
   "scripts": {
     "build": "tsc --declaration",
+    "torunner": "tsc --declaration && cp -rf dist/* ../crawler/runner/node_modules/crawler/dist/",
     "watch": "tsc -w",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "test": "call(){ mocha -r ts-node/register --timeout 30000  \"src/**/*$1.spec.ts\" ; }; call",
