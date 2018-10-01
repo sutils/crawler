@@ -138,7 +138,7 @@ class SimpleListRunner {
                         Log.info("%s start process detail on %s", this.id, task.uri);
                         yield this.gotoDetail(browser, page, task);
                         let result = yield this.processDetailData(browser, page, task);
-                        yield this.storage.save(task.uri, result.data, result.options);
+                        yield this.storage.save(task.uri, task.tags, result.data, result.options);
                     }
                     catch (e) {
                         Log.info("%s process detail on %s fail with\n", this.id, task.uri, e);

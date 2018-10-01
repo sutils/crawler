@@ -18,7 +18,7 @@ describe('SimpleList', async () => {
         bootstrap: (options: any): Promise<any> => {
             return;
         },
-        save: (uri: string, data: any, options: any): Promise<any> => {
+        save: (uri: string, tags: string[], data: any, options: any): Promise<any> => {
             console.log("saving %s by %s data \n\n%s\n\n", uri, data.length, data);
             return
         },

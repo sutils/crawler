@@ -1,6 +1,8 @@
 {
     "listen": 11230,
-    "runners": [],
+    "runners": [
+        "crawler-news"
+    ],
     "tasks": [
         {
             "id": "qiwen8.com",

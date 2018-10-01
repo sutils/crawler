@@ -136,7 +136,7 @@ export abstract class SimpleListRunner implements Runner {
                     Log.info("%s start process detail on %s", this.id, task.uri);
                     await this.gotoDetail(browser, page, task);
                     let result = await this.processDetailData(browser, page, task);
-                    await this.storage.save(task.uri, result.data, result.options);
+                    await this.storage.save(task.uri, task.tags, result.data, result.options);
                 } catch (e) {
                     Log.info("%s process detail on %s fail with\n", this.id, task.uri, e);
                 }
