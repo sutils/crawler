@@ -37,6 +37,11 @@ export class MaxBrowserContextCreator implements BrowserContextCreator {
 
     public async freeIncognitoBrowserContext(key: string, context: BrowserContext): Promise<void> {
         await this.creator.freeIncognitoBrowserContext(key, context)
+        if (this.waiting.length) {
+            let next = this.waiting.pop();
+            next.resolve(await this.creator.createIncognitoBrowserContext(key));
+            return;
+        }
         this.running--;
     }
 

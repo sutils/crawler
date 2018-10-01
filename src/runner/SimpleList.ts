@@ -36,15 +36,15 @@ export abstract class SimpleListRunner implements Runner {
     public async process(browser: BrowserContextCreator): Promise<any> {
         Log.info("%s is starting by %s", this.id, JSON.stringify(this.options));
         let limited = new MaxBrowserContextCreator(browser, this.options.limit.context.max);
-        let delay = this.options.delay == undefined ? 30000 : this.options.delay;
         while (true) {
             await this.processOnce(limited);
-            if (delay < 1) {
+            if (this.options.delay) {
+                Log.info("%s will restart process after %sms", this.id, this.options.delay);
+                await sleep(this.options.delay);
+            } else {
                 Log.info("%s is done", this.id);
                 break;
             }
-            Log.info("%s will restart process after %sms", this.id, delay);
-            await sleep(delay);
         }
     }
 

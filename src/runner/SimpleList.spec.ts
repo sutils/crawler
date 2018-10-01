@@ -3,6 +3,7 @@ import { launch, Browser, Page } from 'puppeteer';
 import { SimpleListRunner, SimpleListTask } from './SimpleList';
 import { BrowserContextCreator, NativeBrowserContextCreator } from '../runner';
 import * as log4js from "log4js";
+import { sleep } from '../util';
 describe('SimpleList', async () => {
     log4js.configure({
         appenders: {
@@ -21,23 +22,21 @@ describe('SimpleList', async () => {
             console.log("saving %s by %s data \n\n%s\n\n", uri, data.length, data);
             return
         },
-        exist: (uri: string[]): Promise<number> => {
-            return Promise.resolve(uri.length);
+        exist: (...uris: string[]): Promise<number> => {
+            return Promise.resolve(uris.length);
         },
         release: (): Promise<any> => {
             return;
         }
     }
-    let nativeBrowser: Browser;
-    let browser: NativeBrowserContextCreator
-    before(async () => {
+    it("TestRunner0", async () => {
+        let nativeBrowser: Browser;
+        let browser: NativeBrowserContextCreator
         nativeBrowser = await launch({
             args: ["--blink-settings=imagesEnabled=false", "--proxy-server="],
             headless: false,
         });
         browser = new NativeBrowserContextCreator(nativeBrowser);
-    })
-    it("TestRunner0", async () => {
         let categoried: number = 0;
         class TestRunner0 extends SimpleListRunner {
             protected async processCategoryData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<boolean> {
@@ -58,6 +57,7 @@ describe('SimpleList', async () => {
                 return categoried < 3;
             }
             protected async processDetailData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any> {
+                await sleep(1000);
                 return { data: await page.evaluate(() => document.body.innerHTML) };
             }
         }
@@ -79,10 +79,43 @@ describe('SimpleList', async () => {
                 }
             ]
         };
-        await runner.process(browser)
+        runner.storage = storage;
+        await runner.process(browser);
+        await nativeBrowser.close();
     })
-
-    after(async () => {
+    it("TestRunner1", async () => {
+        let nativeBrowser: Browser;
+        let browser: NativeBrowserContextCreator
+        nativeBrowser = await launch({
+            args: ["--blink-settings=imagesEnabled=false", "--proxy-server="],
+            headless: false,
+        });
+        browser = new NativeBrowserContextCreator(nativeBrowser);
+        class TestRunner1 extends SimpleListRunner {
+            protected async processCategoryData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<boolean> {
+                return false;
+            }
+            protected async processDetailData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any> {
+                throw new Error("error");
+            }
+        }
+        let runner = new TestRunner1("test", storage);
+        runner.options = {
+            "id": "test",
+            "type": "TestRunner",
+            "delay": 100,
+            "limit": {
+                "context": {
+                    "max": 16,
+                },
+            },
+            "categories": []
+        };
+        runner.storage = storage;
+        setTimeout(() => {
+            runner.options.delay = 0;
+        }, 500)
+        await runner.process(browser);
         await nativeBrowser.close();
     })
 });
