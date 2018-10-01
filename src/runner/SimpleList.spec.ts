@@ -1,6 +1,6 @@
 import 'mocha';
 import { launch, Browser, Page } from 'puppeteer';
-import { SimpleListRunner, Task } from './SimpleList';
+import { SimpleListRunner, SimpleListTask } from './SimpleList';
 import { BrowserContextCreator, NativeBrowserContextCreator } from '../runner';
 import * as log4js from "log4js";
 describe('SimpleList', async () => {
@@ -34,28 +34,29 @@ describe('SimpleList', async () => {
     it("TestRunner0", async () => {
         let categoried: number = 0;
         class TestRunner0 extends SimpleListRunner {
-            protected async processCategoryData(browser: BrowserContextCreator, page: Page, task: Task): Promise<boolean> {
+            protected async processCategoryData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<boolean> {
                 categoried++;
                 switch (categoried) {
                     case 1:
-                        this.detailQueue.push(new Task(task.tags, "http://www.baidu.com"));
-                        this.detailQueue.push(new Task(task.tags, "http://www.baidu.com"));
-                        this.detailQueue.push(new Task(task.tags, "http://www.baidu.com"));
-                        this.categoryQueue.push(new Task(task.tags, "http://www.baidu.com"));
+                        this.detailQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
+                        this.detailQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
+                        this.detailQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
+                        this.categoryQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
                     case 2:
-                        this.detailQueue.push(new Task(task.tags, "http://www.baidu.com"));
-                        this.detailQueue.push(new Task(task.tags, "http://www.baidu.com"));
-                        this.categoryQueue.push(new Task(task.tags, "http://www.baidu.com"));
+                        this.detailQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
+                        this.detailQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
+                        this.categoryQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
                     case 3:
-                        this.categoryQueue.push(new Task(task.tags, "http://www.baidu.com"));
+                        this.categoryQueue.push(new SimpleListTask(task.tags, "http://www.baidu.com"));
                 }
                 return categoried < 3;
             }
-            protected async processDetailData(browser: BrowserContextCreator, page: Page, task: Task): Promise<any> {
+            protected async processDetailData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any> {
                 return { data: await page.evaluate(() => document.body.innerHTML) };
             }
         }
-        await new TestRunner0({
+        let runner = new TestRunner0("test", storage);
+        runner.options = {
             "id": "test",
             "type": "TestRunner",
             "delay": 0,
@@ -71,7 +72,8 @@ describe('SimpleList', async () => {
                     "tags": ["test"]
                 }
             ]
-        }, storage).process(browser)
+        };
+        await runner.process(browser)
     })
 
     after(async () => {

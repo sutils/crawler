@@ -1,0 +1,29 @@
+{
+    "listen": 11230,
+    "runners": [],
+    "tasks": [
+        {
+            "id": "qiwen8.com",
+            "type": "SimpleList",
+            "delay": 0,
+            "limit": {
+                "context": {
+                    "max": 16,
+                    "pages": 5
+                },
+                "categories": {
+                    "page_max": 1,
+                    "item_max": 3
+                }
+            },
+            "categories": [
+                {
+                    "url": "",
+                    "tags": []
+                }
+            ]
+        }
+    ],
+    "log": "./logs/crawler",
+    "level": "debug"
+}

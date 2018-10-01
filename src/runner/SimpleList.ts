@@ -6,7 +6,7 @@ import * as log4js from "log4js";
 
 const Log = log4js.getLogger("SimpleListRunner");
 
-export class Task {
+export class SimpleListTask {
     public tags: string[]
     public uri: string
     public options: any;
@@ -22,16 +22,14 @@ export abstract class SimpleListRunner implements Runner {
     public id: string
     public options: any;
     public storage: DataStorage;
-    protected detailQueue: Task[] = [];
+    protected detailQueue: SimpleListTask[] = [];
     protected detailRunning: number = 0;
     protected detailSequence: number = 0;
     protected detialProcessor: any = {};
-    protected categoryQueue: Task[] = [];
+    protected categoryQueue: SimpleListTask[] = [];
 
-    public constructor(options: any, storage: DataStorage) {
-        this.options = options;
-        this.id = options.id;
-        this.storage = storage;
+    public constructor(id: string, ...args: any[]) {
+        this.id = id;
     }
 
     public async process(browser: BrowserContextCreator): Promise<any> {
@@ -55,7 +53,7 @@ export abstract class SimpleListRunner implements Runner {
         //
         for (let i = 0; i < this.options.categories.length; i++) {
             let category = this.options.categories[i];
-            this.categoryQueue.push(new Task(category.tags, category.uri));
+            this.categoryQueue.push(new SimpleListTask(category.tags, category.uri));
         }
         await this.processCategory(browser, pagesLimit)
         let allProcessor = [];
@@ -67,11 +65,11 @@ export abstract class SimpleListRunner implements Runner {
         Log.info("%s once process is done", this.id);
     }
 
-    protected async gotoCategory(browser: BrowserContextCreator, page: Page, task: Task): Promise<any> {
+    protected async gotoCategory(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any> {
         return page.goto(task.uri, { waitUntil: "networkidle2" });
     }
 
-    protected abstract async processCategoryData(browser: BrowserContextCreator, page: Page, task: Task): Promise<boolean>;
+    protected abstract async processCategoryData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<boolean>;
 
     protected async processCategory(browser: BrowserContextCreator, pagesLimit: number): Promise<any> {
         Log.info("%s category process is starting with %s bootstrap category", this.id, this.categoryQueue.length);
@@ -107,11 +105,11 @@ export abstract class SimpleListRunner implements Runner {
         Log.info("%s category process is done", this.id);
     }
 
-    protected async gotoDetail(browser: BrowserContextCreator, page: Page, task: Task): Promise<any> {
+    protected async gotoDetail(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any> {
         return page.goto(task.uri, { waitUntil: "networkidle2" });
     }
 
-    protected abstract async processDetailData(browser: BrowserContextCreator, page: Page, task: Task): Promise<any>;
+    protected abstract async processDetailData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any>;
 
     protected async startProcessDetail(browser: BrowserContextCreator, pagesLimit: number): Promise<any> {
         if (this.detailRunning >= pagesLimit) {
@@ -162,5 +160,3 @@ export abstract class SimpleListRunner implements Runner {
     }
 
 }
-
-export const Key = "SimpleList";

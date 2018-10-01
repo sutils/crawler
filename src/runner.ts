@@ -1,7 +1,4 @@
-
 import { Browser, BrowserContext, Page } from 'puppeteer';
-
-
 export interface BrowserContextCreator {
     browser: Browser;
     createIncognitoBrowserContext(key: string): Promise<BrowserContext>;
@@ -74,9 +71,24 @@ export class NativeBrowserContextCreator implements BrowserContextCreator {
 
 export interface Runner {
     id: string;
-    options?: any;
+    options: any;
     storage: DataStorage;
     process(browser: BrowserContextCreator): Promise<any>;
+}
+
+var runners: any = {};
+
+export function Register(key: string, creator: (id: string, ...args: any[]) => Runner) {
+    runners[key] = creator;
+}
+
+export function NewRunner(key: string, id: string, ...args: any[]): Runner {
+    let creator = runners[key];
+    if (creator) {
+        return runners[key](id, ...args);
+    } else {
+        return null;
+    }
 }
 
 export interface DataStorage {
