@@ -1,0 +1,29 @@
+{
+    "name": "cny",
+    "listen": "",
+    "cert": "/Users/vty/.bsrouter/bsrouter.pem",
+    "key": "/Users/vty/.bsrouter/bsrouter.key",
+    "socks5": ":10081",
+    "proxy": {
+        "id": "proxy",
+        "type": "balance",
+        "matcher": "^.*://.*$",
+        "dialers": [
+            {
+                "id": "basic",
+                "type": "tcp"
+            }
+        ],
+        "policy": [
+            {
+                "matcher": ".*",
+                "limit": [
+                    3000,
+                    10
+                ]
+            }
+        ]
+    },
+    "showlog": 0,
+    "logflags": 0
+}

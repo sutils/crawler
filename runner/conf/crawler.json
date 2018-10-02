@@ -3,6 +3,7 @@
     "runners": [
         "crawler-news"
     ],
+    "proxy": "127.0.0.1:10081",
     "tasks": [
         {
             "id": "qiwen8.com",
