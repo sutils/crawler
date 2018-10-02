@@ -82,7 +82,7 @@ export abstract class SimpleListRunner implements Runner {
     }
 
     protected async gotoCategory(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any> {
-        return page.goto(task.uri, { waitUntil: "networkidle2" });
+        return page.goto(task.uri, { waitUntil: "networkidle2", timeout: this.options.timeout });
     }
 
     protected abstract async processCategoryItemList(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<CategoryItemList>;
@@ -134,7 +134,7 @@ export abstract class SimpleListRunner implements Runner {
         let page: Page = null;
         let pageUsed: number = 0;
         while (this.categoryQueue.length) {
-            let task = this.categoryQueue.pop();
+            let task = this.categoryQueue.shift();
             if (!page) {
                 page = await browser.newPage(this.id);
             }
@@ -164,7 +164,7 @@ export abstract class SimpleListRunner implements Runner {
     }
 
     protected async gotoDetail(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any> {
-        return page.goto(task.uri, { waitUntil: "networkidle2" });
+        return page.goto(task.uri, { waitUntil: "networkidle2", timeout: this.options.timeout });
     }
 
     protected abstract async processDetailPage(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<DetailPage>;
@@ -191,7 +191,7 @@ export abstract class SimpleListRunner implements Runner {
             let page: Page = null;
             let pageUsed: number = 0;
             while (this.detailQueue.length) {
-                let task = this.detailQueue.pop();
+                let task = this.detailQueue.shift();
                 if (!page) {
                     page = await browser.newPage(this.id);
                 }

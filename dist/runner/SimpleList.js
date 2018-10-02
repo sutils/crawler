@@ -88,7 +88,7 @@ class SimpleListRunner {
     }
     gotoCategory(browser, page, task) {
         return __awaiter(this, void 0, void 0, function* () {
-            return page.goto(task.uri, { waitUntil: "networkidle2" });
+            return page.goto(task.uri, { waitUntil: "networkidle2", timeout: this.options.timeout });
         });
     }
     processCategoryData(browser, page, task) {
@@ -118,7 +118,7 @@ class SimpleListRunner {
                 }
             }
             if (detailFound < 1) {
-                Log.info("%s process category is done with detail is empty on %s, will skip category page", this.id, detailFound, task.uri);
+                Log.info("%s process category is done with new detail is empty on %s, will skip category page", this.id, detailFound, task.uri);
                 return false;
             }
             let categoryFound = 0;
@@ -138,7 +138,7 @@ class SimpleListRunner {
             let page = null;
             let pageUsed = 0;
             while (this.categoryQueue.length) {
-                let task = this.categoryQueue.pop();
+                let task = this.categoryQueue.shift();
                 if (!page) {
                     page = yield browser.newPage(this.id);
                 }
@@ -170,7 +170,7 @@ class SimpleListRunner {
     }
     gotoDetail(browser, page, task) {
         return __awaiter(this, void 0, void 0, function* () {
-            return page.goto(task.uri, { waitUntil: "networkidle2" });
+            return page.goto(task.uri, { waitUntil: "networkidle2", timeout: this.options.timeout });
         });
     }
     processDetailData(browser, page, task) {
@@ -196,7 +196,7 @@ class SimpleListRunner {
                 let page = null;
                 let pageUsed = 0;
                 while (this.detailQueue.length) {
-                    let task = this.detailQueue.pop();
+                    let task = this.detailQueue.shift();
                     if (!page) {
                         page = yield browser.newPage(this.id);
                     }
