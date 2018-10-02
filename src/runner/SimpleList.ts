@@ -114,7 +114,7 @@ export abstract class SimpleListRunner implements Runner {
                 allUri.push(task.uri);
             }
         }
-        if (detailFound < 1) {
+        if (this.options.refresh == "page" && detailFound < 1) {
             Log.info("%s process category is done with new detail is empty on %s, will skip category page", this.id, detailFound, task.uri);
             return false;
         }
