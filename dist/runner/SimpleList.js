@@ -20,6 +20,15 @@ class SimpleListTask {
     }
 }
 exports.SimpleListTask = SimpleListTask;
+class CategoryItemList {
+}
+exports.CategoryItemList = CategoryItemList;
+class DetailPage {
+}
+exports.DetailPage = DetailPage;
+class DetailData {
+}
+exports.DetailData = DetailData;
 class SimpleListRunner {
     constructor(id, ...args) {
         this.detailQueue = [];
@@ -54,7 +63,7 @@ class SimpleListRunner {
             //
             for (let i = 0; i < this.options.categories.length; i++) {
                 let category = this.options.categories[i];
-                this.categoryQueue.push(new SimpleListTask(category.tags, category.uri));
+                this.categoryQueue.push(new SimpleListTask(category.tags, category.uri, category.options));
             }
             yield this.processCategory(browser, pagesLimit);
             let allProcessor = [];
@@ -69,6 +78,47 @@ class SimpleListRunner {
     gotoCategory(browser, page, task) {
         return __awaiter(this, void 0, void 0, function* () {
             return page.goto(task.uri, { waitUntil: "networkidle2" });
+        });
+    }
+    processCategoryData(browser, page, task) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = yield this.processCategoryItemList(browser, page, task);
+            let detailFound = 0;
+            if (result.details && result.details.length) {
+                let allUri = [];
+                for (let i = 0; i < result.details.length; i++) {
+                    let detail = result.details[i];
+                    allUri.push(detail.uri);
+                }
+                let havingResult = yield this.storage.find("uri", ...allUri);
+                let having = {};
+                for (let i = 0; i < havingResult.length; i++) {
+                    having[havingResult[i].uri] = 1;
+                }
+                for (let i = 0; i < result.details.length; i++) {
+                    let detail = result.details[i];
+                    if (having[detail.uri]) {
+                        continue;
+                    }
+                    detailFound++;
+                    let options = yield this.processCategoryItemOptions(task, detail);
+                    this.detailQueue.push(new SimpleListTask(task.tags, detail.uri, options));
+                    allUri.push(task.uri);
+                }
+            }
+            if (detailFound < 1) {
+                Log.info("%s process category is done with detail is empty on %s, will skip category page", this.id, detailFound, task.uri);
+                return false;
+            }
+            let categoryFound = 0;
+            if (result.categories && result.categories.length) {
+                for (let i = 0; i < result.categories.length; i++) {
+                    this.categoryQueue.push(new SimpleListTask(task.tags, result.categories[i].uri, task.options));
+                }
+                categoryFound = result.categories.length;
+            }
+            Log.info("%s process category is done with category:%s,detail:%s on %s", this.id, categoryFound, detailFound, task.uri);
+            return detailFound > 0;
         });
     }
     processCategory(browser, pagesLimit) {
@@ -112,15 +162,19 @@ class SimpleListRunner {
             return page.goto(task.uri, { waitUntil: "networkidle2" });
         });
     }
-    startProcessDetail(browser, pagesLimit) {
+    processDetailData(browser, page, task) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.detailRunning >= pagesLimit) {
-                return;
+            let allData = "";
+            while (true) {
+                let result = yield this.processDetailPage(browser, page, task);
+                allData += result.data;
+                if (!result.next) {
+                    break;
+                }
+                yield page.goto(result.next, { waitUntil: "networkidle2" });
             }
-            this.detailRunning++;
-            let index = this.detailSequence++;
-            let processor = this.processDetail(browser, pagesLimit, index);
-            this.detialProcessor[index] = processor;
+            allData = yield this.processDetailPageData(task, allData);
+            return { data: allData, options: task.options };
         });
     }
     processDetail(browser, pagesLimit, index) {
@@ -162,6 +216,17 @@ class SimpleListRunner {
             }
             this.detailRunning--;
             delete this.detialProcessor[index];
+        });
+    }
+    startProcessDetail(browser, pagesLimit) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.detailRunning >= pagesLimit) {
+                return;
+            }
+            this.detailRunning++;
+            let index = this.detailSequence++;
+            let processor = this.processDetail(browser, pagesLimit, index);
+            this.detialProcessor[index] = processor;
         });
     }
 }

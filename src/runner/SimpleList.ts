@@ -18,6 +18,21 @@ export class SimpleListTask {
     }
 }
 
+export class CategoryItemList {
+    public details: any[] = [];
+    public categories: any[] = [];
+}
+
+export class DetailPage {
+    public data: string = "";
+    public next: string = "";
+}
+
+export class DetailData {
+    public data: string = "";
+    public options: any;
+}
+
 
 export abstract class SimpleListRunner implements Runner {
     public id: string
@@ -54,7 +69,7 @@ export abstract class SimpleListRunner implements Runner {
         //
         for (let i = 0; i < this.options.categories.length; i++) {
             let category = this.options.categories[i];
-            this.categoryQueue.push(new SimpleListTask(category.tags, category.uri));
+            this.categoryQueue.push(new SimpleListTask(category.tags, category.uri, category.options));
         }
         await this.processCategory(browser, pagesLimit)
         let allProcessor = [];
@@ -70,7 +85,49 @@ export abstract class SimpleListRunner implements Runner {
         return page.goto(task.uri, { waitUntil: "networkidle2" });
     }
 
-    protected abstract async processCategoryData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<boolean>;
+    protected abstract async processCategoryItemList(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<CategoryItemList>;
+
+    protected abstract async processCategoryItemOptions(task: SimpleListTask, detail: any): Promise<any>;
+
+    protected async processCategoryData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<boolean> {
+        let result = await this.processCategoryItemList(browser, page, task);
+        let detailFound: number = 0;
+        if (result.details && result.details.length) {
+            let allUri: string[] = [];
+            for (let i = 0; i < result.details.length; i++) {
+                let detail = result.details[i];
+                allUri.push(detail.uri);
+            }
+            let havingResult = await this.storage.find("uri", ...allUri);
+            let having: any = {};
+            for (let i = 0; i < havingResult.length; i++) {
+                having[havingResult[i].uri] = 1;
+            }
+            for (let i = 0; i < result.details.length; i++) {
+                let detail = result.details[i];
+                if (having[detail.uri]) {
+                    continue;
+                }
+                detailFound++;
+                let options = await this.processCategoryItemOptions(task, detail);
+                this.detailQueue.push(new SimpleListTask(task.tags, detail.uri, options));
+                allUri.push(task.uri);
+            }
+        }
+        if (detailFound < 1) {
+            Log.info("%s process category is done with detail is empty on %s, will skip category page", this.id, detailFound, task.uri);
+            return false;
+        }
+        let categoryFound: number = 0;
+        if (result.categories && result.categories.length) {
+            for (let i = 0; i < result.categories.length; i++) {
+                this.categoryQueue.push(new SimpleListTask(task.tags, result.categories[i].uri, task.options));
+            }
+            categoryFound = result.categories.length;
+        }
+        Log.info("%s process category is done with category:%s,detail:%s on %s", this.id, categoryFound, detailFound, task.uri);
+        return detailFound > 0;
+    }
 
     protected async processCategory(browser: BrowserContextCreator, pagesLimit: number): Promise<any> {
         Log.info("%s category process is starting with %s bootstrap category", this.id, this.categoryQueue.length);
@@ -110,16 +167,22 @@ export abstract class SimpleListRunner implements Runner {
         return page.goto(task.uri, { waitUntil: "networkidle2" });
     }
 
-    protected abstract async processDetailData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<any>;
+    protected abstract async processDetailPage(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<DetailPage>;
+    protected abstract async processDetailPageData(task: SimpleListTask, data: string): Promise<string>;
 
-    protected async startProcessDetail(browser: BrowserContextCreator, pagesLimit: number): Promise<any> {
-        if (this.detailRunning >= pagesLimit) {
-            return;
+    protected async processDetailData(browser: BrowserContextCreator, page: Page, task: SimpleListTask): Promise<DetailData> {
+        let detail = new DetailData();
+        while (true) {
+            let result = await this.processDetailPage(browser, page, task);
+            detail.data += result.data;
+            if (!result.next) {
+                break;
+            }
+            await page.goto(result.next, { waitUntil: "networkidle2" });
         }
-        this.detailRunning++
-        let index = this.detailSequence++;
-        let processor = this.processDetail(browser, pagesLimit, index);
-        this.detialProcessor[index] = processor;
+        detail.data = await this.processDetailPageData(task, detail.data);
+        detail.options = task.options;
+        return detail;
     }
 
     protected async processDetail(browser: BrowserContextCreator, pagesLimit: number, index: number): Promise<any> {
@@ -158,6 +221,17 @@ export abstract class SimpleListRunner implements Runner {
         }
         this.detailRunning--;
         delete this.detialProcessor[index];
+    }
+
+    protected async startProcessDetail(browser: BrowserContextCreator, pagesLimit: number): Promise<any> {
+        let runnerLimit = this.options.limit.context.max;
+        if (this.detailRunning >= runnerLimit) {
+            return;
+        }
+        this.detailRunning++
+        let index = this.detailSequence++;
+        let processor = this.processDetail(browser, pagesLimit, index);
+        this.detialProcessor[index] = processor;
     }
 
 }
