@@ -22,8 +22,8 @@ describe('SimpleList', async () => {
             console.log("saving %s by %s data \n\n%s\n\n", uri, data.length, data);
             return
         },
-        exist: (...uris: string[]): Promise<number> => {
-            return Promise.resolve(uris.length);
+        find: (fields: string, ...uris: string[]): Promise<any[]> => {
+            throw new Error("not impl");
         },
         release: (): Promise<any> => {
             return;
