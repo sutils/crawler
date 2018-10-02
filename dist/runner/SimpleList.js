@@ -21,12 +21,23 @@ class SimpleListTask {
 }
 exports.SimpleListTask = SimpleListTask;
 class CategoryItemList {
+    constructor() {
+        this.details = [];
+        this.categories = [];
+    }
 }
 exports.CategoryItemList = CategoryItemList;
 class DetailPage {
+    constructor() {
+        this.data = "";
+        this.next = "";
+    }
 }
 exports.DetailPage = DetailPage;
 class DetailData {
+    constructor() {
+        this.data = "";
+    }
 }
 exports.DetailData = DetailData;
 class SimpleListRunner {
@@ -164,17 +175,18 @@ class SimpleListRunner {
     }
     processDetailData(browser, page, task) {
         return __awaiter(this, void 0, void 0, function* () {
-            let allData = "";
+            let detail = new DetailData();
             while (true) {
                 let result = yield this.processDetailPage(browser, page, task);
-                allData += result.data;
+                detail.data += result.data;
                 if (!result.next) {
                     break;
                 }
                 yield page.goto(result.next, { waitUntil: "networkidle2" });
             }
-            allData = yield this.processDetailPageData(task, allData);
-            return { data: allData, options: task.options };
+            detail.data = yield this.processDetailPageData(task, detail.data);
+            detail.options = task.options;
+            return detail;
         });
     }
     processDetail(browser, pagesLimit, index) {
@@ -220,7 +232,8 @@ class SimpleListRunner {
     }
     startProcessDetail(browser, pagesLimit) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.detailRunning >= pagesLimit) {
+            let runnerLimit = this.options.limit.context.max;
+            if (this.detailRunning >= runnerLimit) {
                 return;
             }
             this.detailRunning++;
