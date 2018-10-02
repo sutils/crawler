@@ -115,7 +115,7 @@ export abstract class SimpleListRunner implements Runner {
             }
         }
         if (detailFound < 1) {
-            Log.info("%s process category is done with detail is empty on %s, will skip category page", this.id, detailFound, task.uri);
+            Log.info("%s process category is done with new detail is empty on %s, will skip category page", this.id, detailFound, task.uri);
             return false;
         }
         let categoryFound: number = 0;
