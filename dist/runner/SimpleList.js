@@ -204,7 +204,12 @@ class SimpleListRunner {
                         Log.info("%s start process detail on %s", this.id, task.uri);
                         yield this.gotoDetail(browser, page, task);
                         let result = yield this.processDetailData(browser, page, task);
-                        yield this.storage.save(task.uri, task.tags, result.data, result.options);
+                        if (result.data.length) {
+                            yield this.storage.save(task.uri, task.tags, result.data, result.options);
+                        }
+                        else {
+                            Log.warn("%s process detail on %s fail with data is empty", this.id, task.uri);
+                        }
                     }
                     catch (e) {
                         Log.info("%s process detail on %s fail with\n", this.id, task.uri, e);

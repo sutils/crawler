@@ -70,7 +70,10 @@ class Crawler {
             //process task
             const browser = new runner_1.NativeBrowserContextCreator(nativeBrowser);
             for (let i = 0; i < conf.tasks.length; i++) {
-                this.tasks.push(this.createTask(conf.tasks[i], browser));
+                let task = conf.tasks[i];
+                if (task.enable) {
+                    this.tasks.push(this.createTask(task, browser));
+                }
             }
         });
     }
