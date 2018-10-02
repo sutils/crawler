@@ -55,10 +55,7 @@ class Crawler {
             yield this.storage.bootstrap(conf.storage);
             //
             //load browser
-            let proxy = conf.proxy ? conf.proxy : "";
-            const nativeBrowser = yield puppeteer_1.launch({
-                args: ["--blink-settings=imagesEnabled=false", "--proxy-server=" + proxy]
-            });
+            const nativeBrowser = yield puppeteer_1.launch(conf.puppeteer);
             let userAgent = yield nativeBrowser.userAgent();
             let version = yield nativeBrowser.version();
             Log.info("crawler is using chrome:" + version + ", agent:" + userAgent);

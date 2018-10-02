@@ -44,10 +44,7 @@ export class Crawler {
         await this.storage.bootstrap(conf.storage);
         //
         //load browser
-        let proxy = conf.proxy ? conf.proxy : "";
-        const nativeBrowser = await launch({
-            args: ["--blink-settings=imagesEnabled=false", "--proxy-server=" + proxy]
-        });
+        const nativeBrowser = await launch(conf.puppeteer);
         let userAgent = await nativeBrowser.userAgent();
         let version = await nativeBrowser.version();
         Log.info("crawler is using chrome:" + version + ", agent:" + userAgent);
