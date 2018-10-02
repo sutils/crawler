@@ -3,7 +3,7 @@
     "runners": [
         "crawler-news"
     ],
-    "proxy": "127.0.0.1:10081",
+    "proxy": "socks5://127.0.0.1:10081",
     "tasks": [
         {
             "id": "qiwen8.com",
@@ -31,6 +31,7 @@
     ],
     "storage": {
         "module": "crawler-pg.PgStorage",
+        "status": "new",
         "database": {
             "connectionString": "postgresql://cny:123@loc.m:5432/cny"
         }
