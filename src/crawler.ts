@@ -44,9 +44,9 @@ export class Crawler {
         await this.storage.bootstrap(conf.storage);
         //
         //load browser
-        const nativeBrowser = await launch(conf.puppeteer);
-        let userAgent = await nativeBrowser.userAgent();
-        let version = await nativeBrowser.version();
+        this.browser = await launch(conf.puppeteer);
+        let userAgent = await this.browser.userAgent();
+        let version = await this.browser.version();
         Log.info("crawler is using chrome:" + version + ", agent:" + userAgent);
         //
         //load runner
@@ -57,7 +57,7 @@ export class Crawler {
         }
         //
         //process task
-        const browser = new NativeBrowserContextCreator(nativeBrowser);
+        const browser = new NativeBrowserContextCreator(this.browser);
         for (let i = 0; i < conf.tasks.length; i++) {
             let task = conf.tasks[i];
             if (task.enable) {
@@ -69,6 +69,7 @@ export class Crawler {
     public async close() {
         Log.info("crawler is stopping...");
         await this.browser.close();
+        await this.storage.release();
         await Promise.all(this.tasks);
         Log.info("crawler is stopped");
     }

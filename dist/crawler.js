@@ -55,9 +55,9 @@ class Crawler {
             yield this.storage.bootstrap(conf.storage);
             //
             //load browser
-            const nativeBrowser = yield puppeteer_1.launch(conf.puppeteer);
-            let userAgent = yield nativeBrowser.userAgent();
-            let version = yield nativeBrowser.version();
+            this.browser = yield puppeteer_1.launch(conf.puppeteer);
+            let userAgent = yield this.browser.userAgent();
+            let version = yield this.browser.version();
             Log.info("crawler is using chrome:" + version + ", agent:" + userAgent);
             //
             //load runner
@@ -68,7 +68,7 @@ class Crawler {
             }
             //
             //process task
-            const browser = new runner_1.NativeBrowserContextCreator(nativeBrowser);
+            const browser = new runner_1.NativeBrowserContextCreator(this.browser);
             for (let i = 0; i < conf.tasks.length; i++) {
                 let task = conf.tasks[i];
                 if (task.enable) {
@@ -81,6 +81,7 @@ class Crawler {
         return __awaiter(this, void 0, void 0, function* () {
             Log.info("crawler is stopping...");
             yield this.browser.close();
+            yield this.storage.release();
             yield Promise.all(this.tasks);
             Log.info("crawler is stopped");
         });
