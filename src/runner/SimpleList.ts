@@ -1,5 +1,5 @@
 import { Runner, BrowserContextCreator, MaxBrowserContextCreator } from "../runner";
-import { Storage } from "../storage"
+import { WebStorage } from "../storage"
 import { Page } from "puppeteer";
 import { sleep } from "../util";
 import * as log4js from "log4js";
@@ -37,7 +37,7 @@ export class DetailData {
 export abstract class SimpleListRunner implements Runner {
     public id: string
     public options: any;
-    public storage: Storage;
+    public storage: WebStorage;
     protected detailQueue: SimpleListTask[] = [];
     protected detailRunning: number = 0;
     protected detailSequence: number = 0;

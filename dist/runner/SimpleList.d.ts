@@ -1,5 +1,5 @@
 import { Runner, BrowserContextCreator } from "../runner";
-import { Storage } from "../storage";
+import { WebStorage } from "../storage";
 import { Page } from "puppeteer";
 export declare class SimpleListTask {
     tags: string[];
@@ -22,7 +22,7 @@ export declare class DetailData {
 export declare abstract class SimpleListRunner implements Runner {
     id: string;
     options: any;
-    storage: Storage;
+    storage: WebStorage;
     protected detailQueue: SimpleListTask[];
     protected detailRunning: number;
     protected detailSequence: number;

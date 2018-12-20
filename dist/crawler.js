@@ -45,14 +45,19 @@ class Crawler {
             Log.info("crawler is starting...");
             //
             //load storage
-            if (!conf.storage.module) {
-                throw new Error("storage.module is required");
+            if (conf.loadedStorage) {
+                this.storage = conf.loadedStorage;
             }
-            Log.info("start load storage module by %s", conf.storage.module);
-            let moduleNames = conf.storage.module.split(/\./);
-            let module = require(moduleNames[0]);
-            this.storage = (new module[moduleNames[1]]());
-            yield this.storage.bootstrap(conf.storage);
+            else {
+                if (!conf.storage.module) {
+                    throw new Error("storage.module is required");
+                }
+                Log.info("start load storage module by %s", conf.storage.module);
+                let moduleNames = conf.storage.module.split(/\./);
+                let module = require(moduleNames[0]);
+                this.storage = (new module[moduleNames[1]]());
+                yield this.storage.bootstrap(conf.storage);
+            }
             //
             //load browser
             this.browser = yield puppeteer_1.launch(conf.puppeteer);
