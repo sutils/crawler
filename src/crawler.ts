@@ -37,7 +37,7 @@ export class Crawler {
         if (conf.loadedStorage) {
             this.storage = conf.loadedStorage
         } else {
-            if (!conf.storage.module) {
+            if (!conf.storage || !conf.storage.module) {
                 throw new Error("storage.module is required");
             }
             Log.info("start load storage module by %s", conf.storage.module);
