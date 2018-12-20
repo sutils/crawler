@@ -6,8 +6,8 @@ import { Browser, launch } from 'puppeteer';
 const Log = log4js.getLogger("crawler");
 
 export class Crawler {
-    protected storage: Storage;
-    protected browser: Browser;
+    public storage: Storage;
+    public browser: Browser;
     protected tasks: Promise<any>[] = [];
 
     public Crawler(storage: Storage) {
@@ -34,9 +34,7 @@ export class Crawler {
         Log.info("crawler is starting...");
         //
         //load storage
-        if (conf.loadedStorage) {
-            this.storage = conf.loadedStorage
-        } else {
+        if (!this.storage) {
             if (!conf.storage || !conf.storage.module) {
                 throw new Error("storage.module is required");
             }

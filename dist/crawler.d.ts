@@ -2,8 +2,8 @@ import { BrowserContextCreator } from './runner';
 import { Storage } from "./storage";
 import { Browser } from 'puppeteer';
 export declare class Crawler {
-    protected storage: Storage;
-    protected browser: Browser;
+    storage: Storage;
+    browser: Browser;
     protected tasks: Promise<any>[];
     Crawler(storage: Storage): void;
     createTask(options: any, browser: BrowserContextCreator): Promise<any>;
