@@ -15,7 +15,6 @@ class MaxBrowserContextCreator {
         this.max = 3;
         this.waiting = [];
         this.running = 0;
-        this.pageContext = {};
         this.creator = creator;
         this.browser = creator.browser;
         this.max = max ? max : 3;
@@ -60,6 +59,57 @@ class MaxBrowserContextCreator {
     }
 }
 exports.MaxBrowserContextCreator = MaxBrowserContextCreator;
+class CacheBrowserContextCreator {
+    constructor(creator, max) {
+        this.max = 3;
+        this.contextCache = [];
+        this.pageCache = [];
+        this.creator = creator;
+        this.browser = creator.browser;
+        this.max = max ? max : 3;
+    }
+    createIncognitoBrowserContext(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.contextCache.length) {
+                return this.contextCache.pop();
+            }
+            else {
+                return yield this.creator.createIncognitoBrowserContext(key);
+            }
+        });
+    }
+    freeIncognitoBrowserContext(key, context) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.contextCache.length >= this.max) {
+                yield this.creator.freeIncognitoBrowserContext(key, context);
+            }
+            else {
+                this.contextCache.push(context);
+            }
+        });
+    }
+    newPage(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.pageCache.length) {
+                return this.pageCache.pop();
+            }
+            else {
+                return yield this.creator.newPage(key);
+            }
+        });
+    }
+    freePage(key, page) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.pageCache.length >= this.max) {
+                yield this.creator.freePage(key, page);
+            }
+            else {
+                this.pageCache.push(page);
+            }
+        });
+    }
+}
+exports.CacheBrowserContextCreator = CacheBrowserContextCreator;
 class NativeBrowserContextCreator {
     constructor(browser) {
         this.browser = browser;

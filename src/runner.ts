@@ -19,7 +19,6 @@ export class MaxBrowserContextCreator implements BrowserContextCreator {
 
     private waiting: any[] = [];
     private running: number = 0;
-    private pageContext: any = {};
 
     public constructor(creator: BrowserContextCreator, max?: number) {
         this.creator = creator;
@@ -60,6 +59,54 @@ export class MaxBrowserContextCreator implements BrowserContextCreator {
         return this.freeIncognitoBrowserContext(key, context);
     }
 }
+
+
+export class CacheBrowserContextCreator implements BrowserContextCreator {
+    public browser: Browser;
+    public max: number = 3;
+    public creator: BrowserContextCreator;
+
+    private contextCache: BrowserContext[] = [];
+    private pageCache: Page[] = [];
+
+    public constructor(creator: BrowserContextCreator, max?: number) {
+        this.creator = creator;
+        this.browser = creator.browser;
+        this.max = max ? max : 3;
+    }
+
+    public async createIncognitoBrowserContext(key: string): Promise<BrowserContext> {
+        if (this.contextCache.length) {
+            return this.contextCache.pop()
+        } else {
+            return await this.creator.createIncognitoBrowserContext(key);
+        }
+    }
+
+    public async freeIncognitoBrowserContext(key: string, context: BrowserContext): Promise<void> {
+        if (this.contextCache.length >= this.max) {
+            await this.creator.freeIncognitoBrowserContext(key, context);
+        } else {
+            this.contextCache.push(context);
+        }
+    }
+
+    public async newPage(key: string): Promise<Page> {
+        if (this.pageCache.length) {
+            return this.pageCache.pop()
+        } else {
+            return await this.creator.newPage(key);
+        }
+    }
+    public async freePage(key: string, page: Page): Promise<void> {
+        if (this.pageCache.length >= this.max) {
+            await this.creator.freePage(key, page);
+        } else {
+            this.pageCache.push(page);
+        }
+    }
+}
+
 
 export class NativeBrowserContextCreator implements BrowserContextCreator {
     public browser: Browser;

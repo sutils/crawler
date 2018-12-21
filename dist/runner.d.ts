@@ -13,7 +13,18 @@ export declare class MaxBrowserContextCreator implements BrowserContextCreator {
     creator: BrowserContextCreator;
     private waiting;
     private running;
-    private pageContext;
+    constructor(creator: BrowserContextCreator, max?: number);
+    createIncognitoBrowserContext(key: string): Promise<BrowserContext>;
+    freeIncognitoBrowserContext(key: string, context: BrowserContext): Promise<void>;
+    newPage(key: string): Promise<Page>;
+    freePage(key: string, page: Page): Promise<void>;
+}
+export declare class CacheBrowserContextCreator implements BrowserContextCreator {
+    browser: Browser;
+    max: number;
+    creator: BrowserContextCreator;
+    private contextCache;
+    private pageCache;
     constructor(creator: BrowserContextCreator, max?: number);
     createIncognitoBrowserContext(key: string): Promise<BrowserContext>;
     freeIncognitoBrowserContext(key: string, context: BrowserContext): Promise<void>;
